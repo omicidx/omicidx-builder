@@ -24,3 +24,47 @@ OmicIDX repo]].
   - [ ] SRA
   - [ ] Biosample
   - [ ] GEO
+
+* Pipeline
+
+The data processing pipelines are run from the command-line. Notes are below. 
+
+** SRA
+
+#+begin_src bash
+python -m omicidx_builder.cli sra
+Usage: cli.py sra [OPTIONS] COMMAND [ARGS]...
+
+  Use these commands to process SRA metadata
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  download                        Downloads the files necessary to build
+                                  the...
+  gcs-dump                        Write json.gz format of sra entities to...
+  load-sra-data-to-bigquery       Load gcs files to Bigquery
+  parse-entity                    SRA XML to JSON Transforms an SRA XML...
+  sra-bigquery-for-elasticsearch  ETL queries to create elasticsearch
+                                  tables...
+  sra-gcs-to-elasticsearch        ETL query to public schema for all SRA...
+  sra-to-bigquery                 ETL query to public schema for all SRA...
+  upload                          Upload SRA json to GCS
+#+end_src
+
+#+begin_src bash
+python -m omicidx_builder.cli sra download NCBI_SRA_Mirroring_20190801_Full
+cd NCBI_SRA_Mirroring_20190801_Full
+python -m omicidx_builder.cli sra parse-entity study
+python -m omicidx_builder.cli sra parse-entity sample
+python -m omicidx_builder.cli sra parse-entity experiment
+python -m omicidx_builder.cli sra parse-entity run
+cd ..
+python -m omicidx_builder.cli sra upload NCBI_SRA_Mirroring_20190801_Full
+python -m omicidx_builder.cli sra load-sra-data-to-bigquery
+python -m omicidx_builder.cli sra sra-to-bigquery
+python -m omicidx_builder.cli sra sra-bigquery-for-elasticsearch
+python -m omicidx_builder.cli sra gcs-dump
+python -m omicidx_builder.cli sra sra-gcs-to-elasticsearch
+#+end_src
