@@ -68,3 +68,33 @@ python -m omicidx_builder.cli sra sra-bigquery-for-elasticsearch
 python -m omicidx_builder.cli sra gcs-dump
 python -m omicidx_builder.cli sra sra-gcs-to-elasticsearch
 #+end_src
+
+** Biosample
+
+#+BEGIN_SRC bash
+Usage: cli.py biosample [OPTIONS] COMMAND [ARGS]...
+
+  Use these commands to process biosample records.
+
+Options:
+  --help  Show this message and exit.
+
+Commands:
+  download              Download biosample xml file from NCBI
+  etl-to-public         ETL process (copy) from etl schema to public
+  gcs-dump              Write json.gz format of biosample to gcs
+  gcs-to-elasticsearch
+  load                  Load the gcs biosample.json file to bigquery
+  parse                 Parse xml to json, output to stdout
+  upload                Download biosample xml file from NCBI
+#+END_SRC
+
+In order:
+
+- download
+- parse
+- upload
+- load
+- etl-to-public
+- gcs-dump
+- gcs-to-elasticsearch
