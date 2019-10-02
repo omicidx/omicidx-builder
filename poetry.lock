@@ -420,6 +420,7 @@ ujson = "^1.35"
 reference = "27b5e985a13210ed897ffc5a1fcab7fa6f60bacf"
 type = "git"
 url = "https://github.com/seandavi/omicidx.git"
+
 [[package]]
 category = "dev"
 description = "A Python Parser"
@@ -632,6 +633,14 @@ postgresql_psycopg2cffi = ["psycopg2cffi"]
 pymysql = ["pymysql"]
 
 [[package]]
+category = "main"
+description = "Python Library for Tom's Obvious, Minimal Language"
+name = "toml"
+optional = false
+python-versions = "*"
+version = "0.10.0"
+
+[[package]]
 category = "dev"
 description = "Traitlets Python config system"
 name = "traitlets"
@@ -685,7 +694,7 @@ python-versions = "*"
 version = "0.1.7"
 
 [metadata]
-content-hash = "9ec7157dc39baf2fdfc9c788b8dd16218623c0ec4bd1a5d71889938bb8f39faa"
+content-hash = "2a459d10ea56346f61c0ff7a4b04b92d76b9713ea68b74cf5b677e20a33be5a6"
 python-versions = "^3.7"
 
 [metadata.hashes]
@@ -740,6 +749,7 @@ s3transfer = ["6efc926738a3cd576c2a79725fed9afde92378aa5c6a957e3af010cb019fac9d"
 sd-cloud-utils = ["0b2fc1405b6bb0132af2371921f07a7f58d7195a84fb0b302885543340cc8411", "adf319a298c20922260ee91758a9c8fca0e4b7ab275fb431bcb4d03e893cb172"]
 six = ["3350809f0555b11f552448330d0b52d5f24c91a322ea4a15ef22629740f3761c", "d16a0141ec1a18405cd4ce8b4613101da75da0e9a7aec5bdd4fa804d0e0eba73"]
 sqlalchemy = ["2f8ff566a4d3a92246d367f2e9cd6ed3edeef670dcd6dda6dfdc9efed88bcd80"]
+toml = ["229f81c57791a41d65e399fc06bf0848bab550a9dfd5ed66df18ce5f05e73d5c", "235682dd292d5899d361a811df37e04a8828a5b1da3115886b73cf81ebc9100e", "f1db651f9657708513243e61e6cc67d101a39bad662eaa9b5546f789338e07a3"]
 traitlets = ["9c4bd2d267b7153df9152698efb1050a5d84982d3384a37b2c1f7723ba3e7835", "c6cb5e6f57c5a9bdaa40fa71ce7b4af30298fbab9ece9815b5d995ab6217c7d9"]
 ujson = ["f66073e5506e91d204ab0c614a148d5aa938bdbf104751be66f8ad7a222f5f86"]
 uritemplate = ["01c69f4fe8ed503b2951bef85d996a9d22434d2431584b5b107b2981ff416fbd", "1b9c467a940ce9fb9f50df819e8ddd14696f89b9a8cc87ac77952ba416e0a8fd", "c02643cebe23fc8adb5e6becffe201185bf06c40bda5c0b4028a93f1527d011d"]

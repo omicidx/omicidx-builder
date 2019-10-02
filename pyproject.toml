@@ -16,6 +16,7 @@ google-cloud-bigquery = "^1.20"
 google-cloud-storage = "^1.20"
 google-cloud-pubsub = "^0.45"
 omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
+toml = "^0.10.0"
 
 
 [tool.poetry.dev-dependencies]
