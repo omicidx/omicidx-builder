@@ -1,0 +1,15 @@
+[google]
+project = "isb-cgc-01-0006"
+
+[google.bigquery]
+dataset = "omicidx"
+etl_dataset = "omicidx_etl"
+
+[elasticsearch]
+nodes = "https://45e4aslkdfslakdfj.us-east-1.aws.found.io:9243"
+user  = "USERNAME"
+password = "PASSWORD"
+
+[google.storage]
+staging = "gs://temp-testing/abc/"
+export = "gs://omicidx-cancerdatasci-org/exports/"
