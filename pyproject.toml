@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "omicidx_builder"
+version = "0.1.0"
+description = "Tooling to build and deploy omicidx data and resources"
+authors = ["Sean Davis <seandavi@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.scripts]
+omicidx_builder = 'omicidx-builder.cli:cli'
+
+[tool.poetry.dependencies]
+python = "^3.7"
+Click = "^7.0"
+elasticsearch = "^7.0"
+google-cloud-bigquery = "^1.20"
+google-cloud-storage = "^1.20"
+google-cloud-pubsub = "^0.45"
+omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
+
+
+[tool.poetry.dev-dependencies]
+jedi = "^0.15.1"
+ipython = "^7.8"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"

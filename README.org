@@ -1,0 +1,26 @@
+* OmicIDX Builder
+
+This project includes a command-line utility and supporting code to
+process and build the OmicIDX applications and data resources.
+
+The code for parsing and modeling the data are available in the [[http://github.com/seandavi/omicidx][main
+OmicIDX repo]]. 
+
+** Roadmap
+
+- [-] Bigquery tables
+  - [X] SRA 
+  - [X] Biosample
+  - [ ] GEO
+- [-] JSON dump files
+  - [X] SRA
+  - [X] Biosample
+  - [ ] GEO
+- [-] REST API
+  - [ ] SRA
+  - [ ] Biosample
+  - [ ] GEO
+- [-] GraphQL API
+  - [ ] SRA
+  - [ ] Biosample
+  - [ ] GEO
