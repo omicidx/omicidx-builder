@@ -3,62 +3,6 @@
     "mappings": {
 	"dynamic_templates": [
 	    {
-		"BioProject": {
-		    "match": "BioProject",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"BioSample": {
-		    "match": "BioSample",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"status": {
-		    "match": "status",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"accession": {
-		    "match": "accession",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"broker_name": {
-		    "match": "broker_name",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"center_name": {
-		    "match": "center_name",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
-		"study_type": {
-		    "match": "study_type",
-		    "mapping": {
-			"type": "keyword"
-		    }
-		}
-	    },
-	    {
 		"counts": {
 		    "match": "*_count",
 		    "mapping": {
