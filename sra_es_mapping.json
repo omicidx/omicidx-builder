@@ -1,0 +1,225 @@
+{
+    "index_patterns": ["sra_*"],
+    "mappings": {
+	"dynamic_templates": [
+	    {
+		"BioProject": {
+		    "match": "BioProject",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"BioSample": {
+		    "match": "BioSample",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"status": {
+		    "match": "status",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"accession": {
+		    "match": "accession",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"broker_name": {
+		    "match": "broker_name",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"center_name": {
+		    "match": "center_name",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"study_type": {
+		    "match": "study_type",
+		    "mapping": {
+			"type": "keyword"
+		    }
+		}
+	    },
+	    {
+		"counts": {
+		    "match": "*_count",
+		    "mapping": {
+			"type": "long"
+		    }
+		}
+	    },
+	    {
+		"total_bases": {
+		    "match": "total_bases",
+		    "mapping": {
+			"type": "long"
+		    }
+		}
+	    },
+	    {
+		"total_spots": {
+		    "match": "total_spots",
+		    "mapping": {
+			"type": "long"
+		    }
+		}
+	    },
+	    {
+		"taxon_ids": {
+		    "match": "taxon_i*",
+		    "mapping": {
+			"type": "integer"
+		    }
+		}
+	    },
+	    {
+		"pubmed_ids": {
+		    "match": "pubmed_ids",
+		    "mapping": {
+			"type": "integer"
+		    }
+		}
+	    },
+	    {
+		"runs": {
+		    "match":   "runs",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"identifiers": {
+		    "match": "identifiers",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"attributes": {
+		    "match": "attributes",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"attribute_values": {
+		    "path_match": "*.attributes.value",
+		    "mapping": {
+			"fields": {
+			    "keyword": {
+				"ignore_above": 256,
+				"type": "keyword"
+			    }
+			},
+			"type": "text"
+		    }
+		}
+	    },
+	    {
+		"lastupdate": {
+                    "match": "*date",
+		    "mapping": {
+			"type":       "date",
+			"format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss+00:00||yyyy-MM-dd HH:mm:ss 'UTC'"
+		    }
+		}
+	    },
+	    {
+		"published": {
+                    "match": "published",
+		    "mapping": {
+			"type":       "date",
+			"format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss+00:00||yyyy-MM-dd HH:mm:ss 'UTC'"
+		    }
+		}
+	    },
+	    {
+		"received": {
+                    "match": "received",
+		    "mapping": {
+			"type":       "date",
+			"format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss+00:00||yyyy-MM-dd HH:mm:ss 'UTC'"
+		    }
+		}
+	    },
+	    {
+	        "run_date": {
+                    "match": "run_date",
+		    "mapping": {
+			"type":       "date",
+			"format": "yyyy-MM-dd'T'HH:mm:ss||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd HH:mm:ss+00:00||yyyy-MM-dd HH:mm:ss 'UTC'||yyyy-MM-dd HH:mm:ss.SSS 'UTC'"
+		    }
+		}
+	    },
+	    {
+		"xrefs": {
+		    "match": "xrefs",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"file_addons": {
+		    "match": "file_addons",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"reads": {
+		    "match": "reads",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"base_counts": {
+		    "match": "base_counts",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    },
+	    {
+		"qualities": {
+		    "match": "qualities",
+		    "mapping": {
+			"type":       "nested",
+			"include_in_parent": true
+		    }
+		}
+	    }
+	]
+    }    
+}
