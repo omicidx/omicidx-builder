@@ -3,6 +3,7 @@ import click
 import subprocess
 import logging
 import os
+import omicidx
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
@@ -38,7 +39,6 @@ def download_mirror_files(mirrordir):
     
         
 import argparse
-import omicidx.sra_parsers
 import json
 import logging
 import collections
@@ -64,10 +64,10 @@ def process_xml_entity(entity):
     entity=entity
 
     parsers = {
-        'study': omicidx.sra_parsers.SRAStudyRecord,
-        'sample': omicidx.sra_parsers.SRASampleRecord,
-        'run': omicidx.sra_parsers.SRARunRecord,
-        'experiment': omicidx.sra_parsers.SRAExperimentRecord
+        'study': omicidx.sra.parser.SRAStudyRecord,
+        'sample': omicidx.sra.parser.SRASampleRecord,
+        'run': omicidx.sra.parser.SRARunRecord,
+        'experiment': omicidx.sra.parser.SRAExperimentRecord
     }
     sra_parser = parsers[entity]
 
@@ -86,7 +86,7 @@ def process_xml_entity(entity):
     outfname = "{}.json".format(entity)
     ENTITY = entity.upper()
     with open(outfname, 'w') as outfile:
-        with omicidx.sra_parsers.open_file(fname) as f:
+        with omicidx.sra.parser.open_file(fname) as f:
             for event, element in et.iterparse(f):
                 if(event == 'end' and element.tag == ENTITY):
                     rec = sra_parser(element).data
@@ -101,7 +101,7 @@ def process_xml_entity(entity):
              help="""Upload SRA json to GCS""")
 @click.argument('mirrordir')
 def upload_processed_sra_data(mirrordir):
-    from ..gcs_utils import upload_blob_to_gcs
+    from omicidx.gcs_utils import upload_blob_to_gcs
 
     for entity in 'study sample experiment run'.split():
         fname = entity + '.json'
@@ -116,7 +116,7 @@ def upload_processed_sra_data(mirrordir):
     
 @sra.command(help="""Load gcs files to Bigquery""")
 def load_sra_data_to_bigquery():
-    from ..bigquery_utils import (
+    from omicidx.bigquery_utils import (
         load_csv_to_bigquery,
         load_json_to_bigquery,
         parse_bq_json_schema)
@@ -138,7 +138,7 @@ def load_sra_data_to_bigquery():
 
 @sra.command(help="""ETL query to public schema for all SRA entities""")
 def sra_to_bigquery():
-    from ..bigquery_utils import query
+    from omicidx.bigquery_utils import query
     sql = """CREATE OR REPLACE TABLE `isb-cgc-01-0006.omicidx.sra_run` AS
 SELECT 
   run.* EXCEPT (published, lastupdate, received, total_spots, total_bases, avg_length, run_date),
@@ -216,7 +216,7 @@ FROM
 
 
 def _sra_bigquery_for_elasticsearch():
-    from ..bigquery_utils import query
+    from omicidx.bigquery_utils import query
     sql = """CREATE OR REPLACE TABLE omicidx_etl.sra_experiment_for_es AS
 SELECT
   expt.*,
@@ -321,7 +321,7 @@ def sra_bigquery_for_elasticsearch():
 
     
 def _sra_gcs_to_elasticsearch(entity):
-    from ..elasticsearch_utils import bulk_index_from_gcs
+    from omicidx.elasticsearch_utils import bulk_index_from_gcs
     
     bulk_index_from_gcs('omicidx-cancerdatasci-org',
                         'exports/sra/json/{}-'.format(entity),
@@ -331,12 +331,12 @@ def _sra_gcs_to_elasticsearch(entity):
 
 @sra.command(help="""ETL query to public schema for all SRA entities""")
 def sra_gcs_to_elasticsearch():
-    for entity in 'experiment study sample run'.split():
+    for entity in 'sample'.split():
         _sra_gcs_to_elasticsearch(entity)
 
 
 def _sra_to_gcs_for_elasticsearch():
-    from ..bigquery_utils import table_to_gcs
+    from omicidx.bigquery_utils import table_to_gcs
     for entity in 'experiment study sample run'.split():
         table_to_gcs('omicidx_etl',f'sra_{entity}_for_es', f'gs://omicidx-cancerdatasci-org/exports/sra/json/{entity}-*.json.gz')
 
@@ -365,13 +365,13 @@ def download_biosample():
     subprocess.run("wget ftp://ftp.ncbi.nlm.nih.gov/biosample/biosample_set.xml.gz", shell=True)
 
 def upload_biosample():
-    from ..gcs_utils import upload_blob_to_gcs
+    from omicidx.gcs_utils import upload_blob_to_gcs
 
     fname = 'biosample.json'
     upload_blob_to_gcs('temp-testing', fname, 'abc/' + fname)
 
 def load_biosample_from_gcs_to_bigquery():
-    from ..bigquery_utils import load_json_to_bigquery
+    from omicidx.bigquery_utils import load_json_to_bigquery
 
     load_json_to_bigquery('omicidx_etl', 'biosample',
                           'gs://temp-testing/abc/biosample.json')
@@ -405,19 +405,19 @@ def load_biosample_to_bigquery():
 @biosample.command("""etl-to-public""",
                    help = "ETL process (copy) from etl schema to public")
 def biosample_to_public():
-    from ..bigquery_utils import copy_table
+    from omicidx.bigquery_utils import copy_table
     copy_table('omicidx_etl','omicidx',
                'biosample', 'biosample')
 
 @biosample.command("""gcs-dump""",
                    help = "Write json.gz format of biosample to gcs")
 def biosample_to_gcs():
-    from ..bigquery_utils import table_to_gcs
+    from omicidx.bigquery_utils import table_to_gcs
     table_to_gcs('omicidx','biosample', 'gs://omicidx-cancerdatasci-org/exports/biosample/json/biosample-*.json.gz')
 
 
 def _biosample_gcs_to_elasticsearch():
-    from ..elasticsearch_utils import bulk_index_from_gcs
+    from omicidx.elasticsearch_utils import bulk_index_from_gcs
     bulk_index_from_gcs('omicidx-cancerdatasci-org', 'exports/biosample/json/biosample-', 'biosample',
                         max_retries = 3, chunk_size=2000)
 
