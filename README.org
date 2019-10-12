@@ -98,3 +98,23 @@ In order:
 - etl-to-public
 - gcs-dump
 - gcs-to-elasticsearch
+* elasticsearch
+
+#+BEGIN_SRC python
+import elasticsearch_dsl
+import omicidx_builder.elasticsearch_utils as es
+searcher = elasticsearch_dsl.Search(using = es.get_client())
+from elasticsearch_dsl import Search
+
+s = (searcher.index("sra_study")
+    .query("match", title="cancer")   
+    .exclude("match", description="cancer"))
+
+response = s.execute()
+
+for hit in response:
+    print(hit.meta.score, hit.title)
+
+for tag in response.aggregations.per_tag.buckets:
+    print(tag.key, tag.max_lines.value)
+#+END_SRC
