@@ -118,3 +118,15 @@ for hit in response:
 for tag in response.aggregations.per_tag.buckets:
     print(tag.key, tag.max_lines.value)
 #+END_SRC
+* Development
+** running tests
+
+#+BEGIN_SRC bash
+poetry run pytest --cov=omicidx_builder tests
+#+END_SRC
+
+Running long-running tests:
+
+#+BEGIN_SRC bash
+LONG_TESTS=1 poetry run pytest --cov=omicidx_builder tests
+#+END_SRC
