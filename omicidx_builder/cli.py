@@ -4,6 +4,8 @@ import subprocess
 import logging
 import os
 import omicidx
+import omicidx.sra.parser
+
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
