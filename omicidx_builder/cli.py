@@ -323,7 +323,7 @@ def sra_bigquery_for_elasticsearch():
 
     
 def _sra_gcs_to_elasticsearch(entity):
-    from omicidx.elasticsearch_utils import bulk_index_from_gcs
+    from omicidx_builder.elasticsearch_utils import bulk_index_from_gcs
     
     bulk_index_from_gcs('omicidx-cancerdatasci-org',
                         'exports/sra/json/{}-'.format(entity),
@@ -421,7 +421,7 @@ def biosample_to_gcs():
 
 
 def _biosample_gcs_to_elasticsearch():
-    from omicidx.elasticsearch_utils import bulk_index_from_gcs
+    from omicidx_builder.elasticsearch_utils import bulk_index_from_gcs
     bulk_index_from_gcs('omicidx-cancerdatasci-org', 'exports/biosample/json/biosample-', 'biosample',
                         max_retries = 3, chunk_size=2000)
 
