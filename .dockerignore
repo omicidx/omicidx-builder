@@ -1,0 +1,11 @@
+.venv
+.git
+*.egg-info
+*cache
+ATTIC
+**~
+*xml.gz
+config.ini
+**/__pycache__
+**/*pyc
+**.DS_Store
