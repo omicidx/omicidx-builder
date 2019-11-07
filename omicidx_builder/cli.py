@@ -58,7 +58,7 @@ def dateconverter(o):
              Transforms an SRA XML mirroring metadata file into
              corresponding JSON format files. JSON is line-delimited
              JSON (not an array).""")
-@click.argument('entity')
+@click.option('--entity', '-e', help = "entity to process")
 def process_xml_entity(entity):
 
     fname = "meta_{}_set.xml.gz".format(entity)
@@ -332,9 +332,11 @@ def _sra_gcs_to_elasticsearch(entity):
     )
 
 @sra.command(help="""ETL query to public schema for all SRA entities""")
-def sra_gcs_to_elasticsearch():
-    for entity in 'sample'.split():
-        _sra_gcs_to_elasticsearch(entity)
+@click.option('--entity', '-e', multiple=True,
+              help = "Entity (study, sample, experiment, run). Multiple values can be used")
+def sra_gcs_to_elasticsearch(entity):
+    for e in entity:
+        _sra_gcs_to_elasticsearch(e)
 
 
 def _sra_to_gcs_for_elasticsearch():
