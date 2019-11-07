@@ -21,4 +21,4 @@ class Config(dict):
 
         self.update(toml.load(configfile_location))
 
-    
+config = Config()
