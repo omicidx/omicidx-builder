@@ -7,3 +7,5 @@ __pycache__
 #*
 \#*
 config.toml
+omicidx_builder.egg-info
+config.ini
