@@ -18,6 +18,8 @@ google-cloud-storage = "*"
 google-cloud-pubsub = "*"
 omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
 toml = "^0.10"
+ujson = "^1.35"
+pydantic = "^1.1"
 
 
 [tool.poetry.dev-dependencies]
