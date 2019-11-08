@@ -4,7 +4,7 @@ from omicidx_builder.config import config
 import json
 import logging
 logging.basicConfig(level = logging.INFO, format = logging.BASIC_FORMAT)
-
+import gzip
 
 def get_client() -> elasticsearch.client:
     es_config = config['elasticsearch']
@@ -18,7 +18,7 @@ def get_client() -> elasticsearch.client:
     return es
 
 def prep_data(fname, index, id_field):
-    with open(fname) as f:
+    with gzip.open(fname) as f:
         for line in f:
             d = json.loads(line)
             d['_index'] = index
