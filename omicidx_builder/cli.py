@@ -125,7 +125,7 @@ def load_sra_data_to_bigquery():
     from importlib import resources
 
     for i in 'study sample experiment run'.split():
-        with resources.path('omicidx.data.bigquery_schemas',
+        with resources.path('omicidx_builder.data.bigquery_schemas',
                             f"{i}.schema.json") as schemafile:
             load_json_to_bigquery('omicidx_etl',
                                   f'sra_{i}',
