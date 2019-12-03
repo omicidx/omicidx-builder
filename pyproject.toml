@@ -1,9 +1,34 @@
 [tool.poetry]
 name = "omicidx_builder"
-version = "0.2.3"
+version = "0.2.4"
 description = "Tooling to build and deploy omicidx data and resources"
-authors = ["Sean Davis <seandavi@gmail.com>"]
+authors = [
+"Sean Davis <seandavi@gmail.com>"
+]
 license = "MIT"
+
+repository = "https://github.com/seandavi/omicidx-builder"
+#documentation = "https://poetry.eustace.io/docs"
+
+classifiers = [
+"License :: OSI Approved :: MIT License",
+"Operating System :: OS Independent",
+"Topic :: Database",
+"Topic :: Scientific/Engineering :: Bio-Informatics",
+"Environment :: Console",
+"Development Status :: 4 - Beta",
+"Intended Audience :: Science/Research"
+]
+
+
+keywords = [
+"bioinformatics",
+"genomics",
+"metadata",
+"omicidx",
+"sequencing",
+"NCBI"
+]
 
 [tool.poetry.scripts]
 omicidx_builder = 'omicidx_builder.cli:cli'
