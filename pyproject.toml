@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omicidx_builder"
-version = "0.2.4"
+version = "0.2.5"
 description = "Tooling to build and deploy omicidx data and resources"
 authors = [
 "Sean Davis <seandavi@gmail.com>"
@@ -41,7 +41,8 @@ elasticsearch_dsl = "^7"
 google-cloud-bigquery = "*"
 google-cloud-storage = "*"
 google-cloud-pubsub = "*"
-omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
+omicidx = "^0.3.0"
+#omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
 toml = "^0.10"
 ujson = "^1.35"
 pydantic = "^1.1"

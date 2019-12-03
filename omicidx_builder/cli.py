@@ -105,7 +105,7 @@ def process_xml_entity(entity):
 @sra.command('upload', help="""Upload SRA json to GCS""")
 @click.argument('mirrordir')
 def upload_processed_sra_data(mirrordir):
-    from omicidx.gcs_utils import upload_blob_to_gcs
+    from .gcs_utils import upload_blob_to_gcs
 
     for entity in 'study sample experiment run'.split():
         fname = entity + '.json'
@@ -387,7 +387,7 @@ def download_biosample():
 
 
 def upload_biosample():
-    from omicidx.gcs_utils import upload_blob_to_gcs
+    from .gcs_utils import upload_blob_to_gcs
 
     fname = 'biosample.json'
     upload_blob_to_gcs('temp-testing', fname, 'abc/' + fname)
