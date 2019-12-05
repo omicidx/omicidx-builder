@@ -325,15 +325,35 @@ def sra_bigquery_for_elasticsearch():
 
 
 def _sra_gcs_to_elasticsearch(entity):
-    from omicidx_builder.elasticsearch_utils import bulk_index_from_gcs
+    from omicidx_builder.elasticsearch_utils import (
+        bulk_index_from_gcs,
+        swap_indices_behind_alias,
+        index_for_alias,
+        create_alias,
+        delete_index
+    )                                                
+    import uuid
+    e = str(uuid.uuid4())
 
+    idx_name = 'sra_' + entity + e
+    logger.info(f"creating index {idx_name}")
     bulk_index_from_gcs('omicidx-cancerdatasci-org',
                         'exports/sra/json/{}-'.format(entity),
-                        'sra_' + entity,
+                        idx_name,
                         id_field='accession')
+    old_index = index_for_alias('sra_'+entity)
+    if old_index is None:
+        create_alias('sra_'+entity, idx_name)
+        logger.info(f'alias sra_{entity} now points to {idx_name}')
+    else:
+        swap_indices_behind_alias('sra_'+entity, old_index, idx_name)
+        logger.info(f'alias sra_{entity} now points to {idx_name}')
+        delete_index(old_index)
+        logger.info(f'deleted old index {old_index}')
 
 
-@sra.command(help="""ETL query to public schema for all SRA entities""")
+@sra.command('gcs-to-elasticsearch',
+             help="""ETL query to public schema for all SRA entities""")
 @click.option(
     '--entity',
     '-e',
@@ -441,12 +461,37 @@ def biosample_to_gcs():
 
 
 def _biosample_gcs_to_elasticsearch():
-    from omicidx_builder.elasticsearch_utils import bulk_index_from_gcs
+    from omicidx_builder.elasticsearch_utils import (
+        bulk_index_from_gcs,
+        swap_indices_behind_alias,
+        index_for_alias,
+        create_alias,
+        delete_index
+    )                                                
+    import uuid
+    e = str(uuid.uuid4())
+
+    idx_name = 'biosample-' + e
+    logger.info(f"creating index {idx_name}")
     bulk_index_from_gcs('omicidx-cancerdatasci-org',
                         'exports/biosample/json/biosample-',
-                        'biosample',
+                        idx_name,
                         max_retries=3,
-                        chunk_size=2000)
+                        chunk_size=2000,
+                        id_field = 'accession'
+    )
+    old_index = index_for_alias('biosample')
+    if old_index is None:
+        create_alias('biosample', idx_name)
+        logger.info(f'alias biosample now points to {idx_name}')
+    else:
+        swap_indices_behind_alias('biosample', old_index, idx_name)
+        logger.info(f'alias biosample now points to {idx_name}')
+        delete_index(old_index)
+        logger.info(f'deleted old index {old_index}')
+
+    
+    from omicidx_builder.elasticsearch_utils import bulk_index_from_gcs
 
 
 @biosample.command("gcs-to-elasticsearch")

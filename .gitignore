@@ -13,3 +13,4 @@ dist
 ATTIC
 NCBI_*
 .env
+.DS_Store

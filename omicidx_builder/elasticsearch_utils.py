@@ -3,8 +3,8 @@ from elasticsearch.helpers import bulk
 from omicidx_builder.config import config
 import json
 import logging
-logging.basicConfig(level = logging.INFO, format = logging.BASIC_FORMAT)
 import gzip
+logging.basicConfig(level = logging.INFO, format = logging.BASIC_FORMAT)
 
 def get_client() -> elasticsearch.client:
     es_config = config['elasticsearch']
@@ -16,6 +16,8 @@ def get_client() -> elasticsearch.client:
         timeout = 30
     )
     return es
+
+client = get_client()
 
 def prep_data(fname, index, id_field):
     with gzip.open(fname) as f:
@@ -62,5 +64,70 @@ def bulk_index_from_gcs(bucket, prefix, index, id_field=None, **kwargs):
         bulk_index(tmpfile.name, index, id_field=id_field, **kwargs)
         tmpfile.close()
         
+def delete_index(index):
+    """Delete the named index"""
+    if client.indices.exists(index):
+        client.indices.delete(index)
+    else:
+        logging.warn(f"index {index} does not exist, so not deleted!")
         
 
+def create_alias(alias: str, index:str):
+    """Create an alias for an index
+
+    Parameters
+    ----------
+    alias: str
+        the alias name
+    index: str
+        the index name
+    """
+    if client.indices.exists(index):
+        client.indices.put_alias(index, alias)
+        logging.info(f"alias {alias} for index {index} created")
+    else:
+        logging.warn(f"index {index} does not exist, so alias {alias} not created")
+
+def delete_alias(alias: str, index:str = None):
+    """Create an alias for an index
+
+    Parameters
+    ----------
+    alias: str
+        the alias name
+    index: str
+        the index name
+    """
+    if client.indices.exists_alias(index, alias):
+        client.indices.delete_alias(index, alias)
+        logging.info(f"alias {alias} for index {index} deleted")
+    else:
+        logging.warn(f"alias {alias} does not exist")
+
+
+def swap_indices_behind_alias(alias: str, old_index: str, new_index: str):
+    """Swap the alias for old_index to point to new_index"""
+    if client.indices.exists(index=new_index):
+        client.indices.put_alias(index=new_index, name=alias)
+        logging.info(f"alias {alias} for index {new_index} created")
+    else:
+        logging.warn(f"new index {new_index} does not exist, so alias {alias} remains unchanged")
+
+
+def index_for_alias(alias: str):
+    """get the name of the index for a given alias
+
+    Parameters
+    ----------
+    alias: str
+       The name of the alias
+
+    Returns
+    -------
+    str: the name of the matching index (or None)
+    """
+    res = client.indices.get_alias(name=alias)
+    try:
+        return list(res.keys())
+    except:
+        return None
