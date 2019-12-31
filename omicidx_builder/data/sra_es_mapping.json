@@ -3,6 +3,22 @@
     "mappings": {
 	"dynamic_templates": [
 	    {
+		"total_spots": {
+		    "match": "total_spots",
+		    "mapping": {
+			"type": "long"
+		    }
+		}
+	    },
+	    {
+		"total_bases": {
+		    "match": "total_bases",
+		    "mapping": {
+			"type": "long"
+		    }
+		}
+	    },
+	    {
 		"runs": {
 		    "match":   "runs",
 		    "mapping": {
