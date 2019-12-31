@@ -1,0 +1,49 @@
+{
+    "index_patterns": [
+	"biosample*"
+    ],
+    "mappings": {
+	"dynamic_templates": [
+            {
+		"dates" :{
+                    "match": "*date",
+                    "mapping" :{
+			"type":"date",
+			"format": "date_optional_time||epoch_millis||yyyy-MM-dd HH:mm:ss.S 'UTC'||yyyy-MM-dd HH:mm:ss 'UTC'||yyyy-MM-dd HH:mm:ss.SS 'UTC'||yyyy-MM-dd HH:mm:ss.SSS 'UTC'"
+                    }
+		}
+            },
+            {
+		"attribute_recs": {
+		    "mapping": {
+			"type": "nested",
+			"include_in_parent": true
+		    },
+		    "match": "identifiers"
+		}
+            },
+            {
+		"taxon_id": {
+		    "mapping": {
+			"type": "integer"
+		    },
+		    "match": "taxon_id"
+		}
+            },
+            {
+		"attribute_values": {
+		    "path_match": "*.value",
+		    "mapping": {
+			"fields": {
+			    "keyword": {
+				"ignore_above": 256,
+				"type": "keyword"
+			    }
+			},
+			"type": "text"
+		    }
+		}
+            }
+	]
+    }
+}
