@@ -35,6 +35,9 @@ def bulk_index(fname, index, id_field = None, **kwargs):
     bulk(get_client(), prep_data(fname, index, id_field), **kwargs)
 
 
+def put_template(template_name: str, template_body: dict):
+    client.indices.put_template(template_name, template_body)
+
 def bulk_index_from_gcs(bucket, prefix, index, id_field=None, **kwargs):
     """Perform bulk indexing from a set of gcs blobs
 
@@ -106,7 +109,23 @@ def delete_alias(alias: str, index:str = None):
 
 
 def swap_indices_behind_alias(alias: str, old_index: str, new_index: str):
-    """Swap the alias for old_index to point to new_index"""
+    """Swap the alias for old_index to point to new_index
+
+    This just swaps the alias, nothing more. If the new index
+    does not exist, this function is a no-op.
+
+    Parameters
+    ----------
+    alias: str
+        The alias to re-assign
+
+    old_index: str
+        The name of the old index. This index remains intact; only 
+        the alias changes.
+    
+    new_index: str
+        The name of the new index to which to assign the alias.
+    """
     if client.indices.exists(index=new_index):
         client.indices.put_alias(index=new_index, name=alias)
         logging.info(f"alias {alias} for index {new_index} created")
