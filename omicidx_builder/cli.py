@@ -4,7 +4,10 @@ import subprocess
 import logging
 import os
 import omicidx
+from .bigquery_utils import *
 import omicidx.sra.parser
+from .click_root import cli
+from .geo_cli import geo
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,10 +15,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-@click.group(help="""Command-line interface for omicidx processing
-""")
-def cli():
-    pass
+
+
 
 
 @cli.group(help="Use these commands to process SRA metadata")
@@ -119,9 +120,6 @@ def upload_processed_sra_data(mirrordir):
 
 @sra.command(help="""Load gcs files to Bigquery""")
 def load_sra_data_to_bigquery():
-    from omicidx.bigquery_utils import (load_csv_to_bigquery,
-                                        load_json_to_bigquery,
-                                        parse_bq_json_schema)
     from importlib import resources
 
     for i in 'study sample experiment run'.split():
@@ -142,7 +140,6 @@ def load_sra_data_to_bigquery():
 
 @sra.command(help="""ETL query to public schema for all SRA entities""")
 def sra_to_bigquery():
-    from omicidx.bigquery_utils import query
     sql = """CREATE OR REPLACE TABLE `isb-cgc-01-0006.omicidx.sra_run` AS
 SELECT 
   run.* EXCEPT (published, lastupdate, received, total_spots, total_bases, avg_length, run_date),
@@ -220,7 +217,6 @@ FROM
 
 
 def _sra_bigquery_for_elasticsearch():
-    from omicidx.bigquery_utils import query
     sql = """CREATE OR REPLACE TABLE omicidx_etl.sra_experiment_for_es AS
 SELECT
   expt.*,
@@ -365,12 +361,18 @@ def sra_gcs_to_elasticsearch(entity):
         _sra_gcs_to_elasticsearch(e)
 
 
-def _sra_to_gcs_for_elasticsearch():
-    from omicidx.bigquery_utils import table_to_gcs
+def _sra_to_gcs_for_elasticsearch(bucket: str="omicidx-cancerdatasci-org",
+                                  path: str="exports/sra/json"):
+    from google.cloud import storage
+    client = storage.Client()
+    blobs = client.list_blobs(bucket, prefix=path+'/')
+    for blob in blobs:
+        logging.info(f"deleting {blob.name}")
+        blob.delete()
     for entity in 'experiment study sample run'.split():
         table_to_gcs(
             'omicidx_etl', f'sra_{entity}_for_es',
-            f'gs://omicidx-cancerdatasci-org/exports/sra/json/{entity}-*.json.gz'
+            f'gs://{bucket}/{path}/{entity}-*.json.gz'
         )
 
 
@@ -414,7 +416,6 @@ def upload_biosample():
 
 
 def load_biosample_from_gcs_to_bigquery():
-    from omicidx.bigquery_utils import load_json_to_bigquery
 
     load_json_to_bigquery('omicidx_etl', 'biosample',
                           'gs://temp-testing/abc/biosample.json')
@@ -446,14 +447,12 @@ def load_biosample_to_bigquery():
 @biosample.command("""etl-to-public""",
                    help="ETL process (copy) from etl schema to public")
 def biosample_to_public():
-    from omicidx.bigquery_utils import copy_table
     copy_table('omicidx_etl', 'omicidx', 'biosample', 'biosample')
 
 
 @biosample.command("""gcs-dump""",
                    help="Write json.gz format of biosample to gcs")
 def biosample_to_gcs():
-    from omicidx.bigquery_utils import table_to_gcs
     table_to_gcs(
         'omicidx', 'biosample',
         'gs://omicidx-cancerdatasci-org/exports/biosample/json/biosample-*.json.gz'
