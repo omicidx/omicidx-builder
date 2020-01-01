@@ -395,11 +395,17 @@ def biosample():
 from omicidx.biosample import BioSampleParser
 
 
-def biosample_to_json(biosample_file):
+def biosample_to_json(biosample_file: str, output: click.File):
+    n = 0
+    logging.info(f'starting biosample record parsing')
     for i in BioSampleParser(biosample_file):
+        n+=1
         if (i is None):
             break
-        print(i.as_json())
+        if (n % 100000 == 0):
+            logging.info(f'{n} biosample records parsed')
+        output.write(i.as_json())
+    logging.info(f'completing biosample record parsing')
 
 
 def download_biosample():
@@ -434,8 +440,9 @@ def upload():
 
 @biosample.command("""parse""", help="Parse xml to json, output to stdout")
 @click.argument('biosample_file')
-def to_json(biosample_file):
-    biosample_to_json(biosample_file)
+@click.argument('output', type=click.File('w'))
+def to_json(biosample_file, output):
+    biosample_to_json(biosample_file, output)
 
 
 @biosample.command("""load""",
