@@ -41,8 +41,7 @@ elasticsearch_dsl = "^7"
 google-cloud-bigquery = "*"
 google-cloud-storage = "*"
 google-cloud-pubsub = "*"
-omicidx = "^0.3.0"
-#omicidx  = { git = "https://github.com/seandavi/omicidx.git", branch = "master" }
+omicidx = "0.3.10"
 toml = "^0.10"
 ujson = "^1.35"
 pydantic = "^1.1"
@@ -61,5 +60,5 @@ pytest-cov = "^2.8.1"
 pydoc-markdown = "^2.0"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry==1.0"]
 build-backend = "poetry.masonry.api"
