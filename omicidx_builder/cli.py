@@ -331,7 +331,7 @@ def _sra_gcs_to_elasticsearch(entity):
     import uuid
     e = str(uuid.uuid4())
 
-    idx_name = 'sra_' + entity + e
+    idx_name = 'sra_' + entity + '-' + e
     logger.info(f"creating index {idx_name}")
     bulk_index_from_gcs('omicidx-cancerdatasci-org',
                         'exports/sra/json/{}-'.format(entity),
