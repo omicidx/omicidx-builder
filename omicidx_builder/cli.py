@@ -404,7 +404,7 @@ def biosample_to_json(biosample_file: str, output: click.File):
             break
         if (n % 100000 == 0):
             logging.info(f'{n} biosample records parsed')
-        output.write(i.as_json())
+        output.write(i.as_json() + "\n")
     logging.info(f'completing biosample record parsing')
 
 
