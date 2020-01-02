@@ -1,7 +1,9 @@
 * OmicIDX Builder
 
-This project includes a command-line utility and supporting code to
-process and build the OmicIDX applications and data resources.
+OmicIDX Builder includes supporting code to
+process and build the OmicIDX applications and data resources. 
+It is not meant for end-users and requires a Google Cloud Project
+($$) to use. 
 
 Related OmicIDX projects can be found on the [[https://github.com/omicidx/][OmicIDX Github Organization]].
 
