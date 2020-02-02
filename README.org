@@ -51,14 +51,15 @@ omicidx_builder sra --help
 #+end_src
 
 #+begin_src bash
-omicidx_builder sra download NCBI_SRA_Mirroring_20190801_Full
+export NCBI_MIRROR_DIR=NCBI_SRA_Mirroring_20200201_Full
+omicidx_builder sra download $NCBI_MIRROR_DIR
 cd NCBI_SRA_Mirroring_20190801_Full
 omicidx_builder sra parse-entity study
 omicidx_builder sra parse-entity sample
 omicidx_builder sra parse-entity experiment
 omicidx_builder sra parse-entity run
 cd ..
-omicidx_builder sra upload NCBI_SRA_Mirroring_20190801_Full
+omicidx_builder sra upload $NCBI_MIRROR_DIR
 omicidx_builder sra load-sra-data-to-bigquery
 omicidx_builder sra sra-to-bigquery
 omicidx_builder sra sra-bigquery-for-elasticsearch
