@@ -47,7 +47,7 @@
 	    },
 	    {
 		"attribute_values": {
-		    "path_match": "*.attributes.value",
+		    "path_match": "*attributes.value",
 		    "mapping": {
 			"fields": {
 			    "keyword": {

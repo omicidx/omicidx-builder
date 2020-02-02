@@ -19,7 +19,7 @@
 			"type": "nested",
 			"include_in_parent": true
 		    },
-		    "match": "identifiers"
+		    "match": "attribute_recs"
 		}
             },
             {
