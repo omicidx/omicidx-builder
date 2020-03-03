@@ -3,6 +3,10 @@ LABEL maintainer="seandavi@gmail.com"
 LABEL project="omicidx-builder"
 LABEL description="usage: docker run seandavi/omicidx-builder ..."
 
+ENV ES_HOST=""
+ENV GCS_STAGING_PATH=""
+ENV GCS_EXPORT_PATH=""
+
 ENV PYTHONFAULTHANDLER=1 \
   PYTHONUNBUFFERED=1 \
   PYTHONHASHSEED=random \

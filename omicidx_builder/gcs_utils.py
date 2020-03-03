@@ -38,7 +38,7 @@ def list_blobs(bucket_name, prefix):
     storage_client = storage.Client()
     return storage_client.list_blobs(bucket_name, prefix=prefix)
     
-def parse_gcs_url(url: str) -> Tuple(str, str):    
+def parse_gcs_url(url: str) -> tuple():
     import re
     splitter = re.compile('gs://([^/.]+)/(.*)')
     m = splitter.match(url)
