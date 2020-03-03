@@ -36,9 +36,15 @@ Related OmicIDX projects can be found on the [[https://github.com/omicidx/][Omic
 #+END_SRC
 
 
-** Google setup
+** Configuration
 
-TODO
+Needs environment variables:
+
+- ES_HOST
+- GCS_STAGING_URL
+- GCS_EXPORT_URL
+
+
 
 * Pipeline
 

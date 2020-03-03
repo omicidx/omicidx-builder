@@ -1,24 +1,12 @@
-import toml
+"""Config comes from environment variables"""
 import os
 
-def get_configfile_location():
-    """Get toml config file location
 
-    Assumes that an environment variable, "OMICIDX_CONFIGURATION_FILE" 
-    contains the path to a configuration file in toml format
-
-    Returns:
-    str
-    """
-    return os.environ.get('OMICIDX_CONFIGURATION_FILE', 'config.toml')
-
-class Config(dict):
-    def __init__(self, configfile: str = None):
+class Config(object):
+    def __init__(self):
         
-        configfile_location = configfile
-        if(configfile is None):
-            configfile_location = get_configfile_location()
-
-        self.update(toml.load(configfile_location))
+        self.ES_HOST=os.getenv('ES_HOST')
+        self.GCS_STAGING_URL=os.getenv('GCS_STAGING_URL')
+        self.GCS_EXPORT_URL =os.getenv('GCS_EXPORT_URL')
 
 config = Config()

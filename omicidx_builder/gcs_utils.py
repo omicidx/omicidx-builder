@@ -1,6 +1,7 @@
 """Utilities for working with google cloud storage"""
 from google.cloud import storage
 import logging
+from typing import Tuple
 
 
 def upload_blob_to_gcs(bucket_name, source_file_name, destination_blob_name):
@@ -37,4 +38,10 @@ def list_blobs(bucket_name, prefix):
     storage_client = storage.Client()
     return storage_client.list_blobs(bucket_name, prefix=prefix)
     
-    
+def parse_gcs_url(url: str) -> Tuple(str, str):    
+    import re
+    splitter = re.compile('gs://([^/.]+)/(.*)')
+    m = splitter.match(url)
+    if m is None:
+        logging.error(f'{url} does not look like a gs url')
+    return((m[1],m[2]))

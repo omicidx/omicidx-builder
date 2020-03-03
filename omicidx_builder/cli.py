@@ -8,15 +8,18 @@ from .bigquery_utils import *
 import omicidx.sra.parser
 from .click_root import cli
 from .geo_cli import geo
+import argparse
+import json
+import logging
+import collections
+from xml.etree import ElementTree as et
+from .utils import dateconverter
+
 
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 logger = logging.getLogger(__name__)
-
-
-
-
 
 
 @cli.group(help="Use these commands to process SRA metadata")
@@ -44,13 +47,6 @@ def download_mirror_files(mirrordir):
         .format(mirrordir),
         shell=True)
 
-
-import argparse
-import json
-import logging
-import collections
-from xml.etree import ElementTree as et
-from .utils import dateconverter
 
 
 @sra.command("parse-entity",
@@ -106,7 +102,7 @@ def process_xml_entity(entity):
 @sra.command('upload', help="""Upload SRA json to GCS""")
 @click.argument('mirrordir')
 def upload_processed_sra_data(mirrordir):
-    from .gcs_utils import upload_blob_to_gcs
+    from .gcs_utils import upload_blob_to_gcs, parse_gcs_url
 
     for entity in 'study sample experiment run'.split():
         fname = entity + '.json'
@@ -115,7 +111,8 @@ def upload_processed_sra_data(mirrordir):
 
     fname = 'SRA_Accessions.tab'
     loc_fname = os.path.join(mirrordir, fname)
-    upload_blob_to_gcs('temp-testing', loc_fname, 'abc/' + fname)
+    (bucket, path) = parse_gcs_url(config.GCS_STAGING_URL)
+    upload_blob_to_gcs(bucket, loc_fname, os.path.join(path,fname))
 
 
 @sra.command(help="""Load gcs files to Bigquery""")
@@ -424,7 +421,8 @@ def upload_biosample():
     from .gcs_utils import upload_blob_to_gcs
 
     fname = 'biosample.json'
-    upload_blob_to_gcs('temp-testing', fname, 'abc/' + fname)
+    (bucket, path) = parse_gcs_url(config.GCS_EXPORT_URL)
+    upload_blob_to_gcs(bucket, loc_fname, os.path.join(path,fname))
 
 
 def load_biosample_from_gcs_to_bigquery():

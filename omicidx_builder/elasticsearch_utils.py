@@ -13,7 +13,7 @@ def init_connection_object():
     es_config = config['elasticsearch']
     connections.create_connection(
         alias='default',
-        hosts=os.getenv('ES_HOST'),#es_config['nodes'],
+        hosts=config.ES_HOST
         retry_on_timeout = True,
         max_retries = 3,
         timeout = 30
