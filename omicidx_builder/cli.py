@@ -230,6 +230,10 @@ FROM
   LEFT OUTER JOIN 
   `isb-cgc-01-0006.omicidx.sra_study` study
   ON study.accession = expt.study_accession
+WHERE samp.accession IS NOT NULL
+AND study.accession IS NOT NULL
+AND expt.study_accession is NOT NULL
+AND expt.sample_accession is NOT NULL
     """
     query(sql)
 
@@ -250,67 +254,69 @@ FROM
   LEFT OUTER JOIN 
   `isb-cgc-01-0006.omicidx.sra_study` study
   ON study.accession = expt.study_accession
+WHERE samp.accession IS NOT NULL
+AND study.accession IS NOT NULL
+AND expt.study_accession is NOT NULL
+AND expt.sample_accession is NOT NULL
+AND run.experiment_accession IS NOT NULL
 """
     query(sql)
 
     sql = """CREATE OR REPLACE TABLE omicidx_etl.sra_sample_for_es AS
-    WITH agg_counts as
+with agg_counts as 
 (SELECT
   sample.accession,
-  COUNT(DISTINCT expt.accession) as experiment_count,
-  COUNT(DISTINCT run.accession) as run_count,
+  COUNT(DISTINCT(expt.accession)) as experiment_count,
+  COUNT(DISTINCT(run.accession)) as run_count,
   SUM(CAST(run.total_bases as INT64)) as total_bases,
   SUM(CAST(run.total_spots as INT64)) as total_spots,
   AVG(CAST(run.total_bases as INT64)) as mean_bases_per_run
-FROM `isb-cgc-01-0006.omicidx.sra_study` study 
-LEFT OUTER JOIN `isb-cgc-01-0006.omicidx.sra_experiment` expt 
-  ON expt.study_accession = study.accession
-LEFT OUTER JOIN `isb-cgc-01-0006.omicidx.sra_run` run
-  ON run.experiment_accession = expt.accession
+from `isb-cgc-01-0006.omicidx.sra_experiment` expt
+JOIN `isb-cgc-01-0006.omicidx.sra_run` run
+  ON run.experiment_accession = expt.accession and run.experiment_accession is not null and expt.accession is not null
 JOIN `isb-cgc-01-0006.omicidx.sra_sample` sample
-  ON expt.sample_accession = sample.accession
-GROUP BY sample.accession
-) 
-SELECT 
+  ON expt.sample_accession = sample.accession and expt.sample_accession is not null and sample.accession is not null
+JOIN `isb-cgc-01-0006.omicidx.sra_study` study
+  ON expt.study_accession = study.accession and expt.study_accession is not null and study.accession is not null
+group by sample.accession
+)
+select 
   sample.*,
   STRUCT(study).study,
-  agg_counts.* EXCEPT(accession) 
-FROM `isb-cgc-01-0006.omicidx.sra_sample` sample
-LEFT OUTER JOIN agg_counts 
-  ON agg_counts.accession = sample.accession
-JOIN `isb-cgc-01-0006.omicidx.sra_experiment` expt 
-  ON expt.sample_accession = sample.accession
+  agg_counts.* except(accession)
+from `isb-cgc-01-0006.omicidx.sra_experiment` expt
+JOIN `isb-cgc-01-0006.omicidx.sra_sample` sample
+  ON expt.sample_accession = sample.accession and expt.sample_accession is not null and sample.accession is not null
 JOIN `isb-cgc-01-0006.omicidx.sra_study` study
-  ON study.accession=expt.study_accession;
+  ON expt.study_accession = study.accession and expt.study_accession is not null and study.accession is not null
+join agg_counts on agg_counts.accession=sample.accession
 """
     query(sql)
 
     sql = """CREATE OR REPLACE TABLE omicidx_etl.sra_study_for_es AS
-WITH agg_counts as
+with agg_counts as 
 (SELECT
   study.accession,
-  COUNT(DISTINCT expt.sample_accession) as sample_count,
-  COUNT(DISTINCT expt.accession) as experiment_count,
-  COUNT(DISTINCT run.accession) as run_count,
+  COUNT(DISTINCT(sample.accession)) as sample_count,
+  COUNT(DISTINCT(expt.accession)) as experiment_count,
+  COUNT(DISTINCT(run.accession)) as run_count,
   SUM(CAST(run.total_bases as INT64)) as total_bases,
   SUM(CAST(run.total_spots as INT64)) as total_spots,
-  AVG(CAST(run.total_bases as INT64)) as mean_bases_per_run,
-  ARRAY_AGG(DISTINCT sample.taxon_id) as taxon_ids
-FROM `isb-cgc-01-0006.omicidx.sra_study` study 
-JOIN `isb-cgc-01-0006.omicidx.sra_experiment` expt 
-  ON expt.study_accession = study.accession
+  AVG(CAST(run.total_bases as INT64)) as mean_bases_per_run
+from `isb-cgc-01-0006.omicidx.sra_experiment` expt
 JOIN `isb-cgc-01-0006.omicidx.sra_run` run
-  ON run.experiment_accession = expt.accession
+  ON run.experiment_accession = expt.accession and run.experiment_accession is not null and expt.accession is not null
 JOIN `isb-cgc-01-0006.omicidx.sra_sample` sample
-  ON expt.sample_accession = sample.accession
-GROUP BY study.accession
-) 
-SELECT 
+  ON expt.sample_accession = sample.accession and expt.sample_accession is not null and sample.accession is not null
+JOIN `isb-cgc-01-0006.omicidx.sra_study` study
+  ON expt.study_accession = study.accession and expt.study_accession is not null and study.accession is not null
+group by study.accession
+)
+select 
   study.*,
-  agg_counts.* EXCEPT(accession) 
-FROM agg_counts 
-RIGHT OUTER JOIN `isb-cgc-01-0006.omicidx.sra_study` study
-  ON study.accession=agg_counts.accession;
+  agg_counts.* except(accession)
+from `isb-cgc-01-0006.omicidx.sra_study` study
+join agg_counts on agg_counts.accession=study.accession
 """
     query(sql)
 

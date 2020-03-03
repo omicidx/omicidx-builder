@@ -1,21 +1,29 @@
 import elasticsearch
 from elasticsearch.helpers import bulk
+from elasticsearch_dsl import connections
 from omicidx_builder.config import config
 import json
 import logging
 import gzip
 logging.basicConfig(level = logging.INFO, format = logging.BASIC_FORMAT)
+import os
 
-def get_client() -> elasticsearch.client:
+
+def init_connection_object():
     es_config = config['elasticsearch']
-    es = elasticsearch.Elasticsearch(
-        hosts = es_config['nodes'],
-        http_auth=(es_config['user'], es_config['password']),
+    connections.create_connection(
+        alias='default',
+        hosts=os.getenv('ES_HOST'),#es_config['nodes'],
         retry_on_timeout = True,
         max_retries = 3,
         timeout = 30
     )
-    return es
+
+init_connection_object()
+
+def get_client() -> elasticsearch.client:
+    return connections.get_connection()
+    
 
 client = get_client()
 
