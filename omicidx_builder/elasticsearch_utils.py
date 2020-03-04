@@ -10,10 +10,9 @@ import os
 
 
 def init_connection_object():
-    es_config = config['elasticsearch']
     connections.create_connection(
         alias='default',
-        hosts=config.ES_HOST
+        hosts=config.ES_HOST,
         retry_on_timeout = True,
         max_retries = 3,
         timeout = 30
