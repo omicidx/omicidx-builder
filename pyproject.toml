@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omicidx_builder"
-version = "0.3.0"
+version = "0.4.0"
 description = "Tooling to build and deploy omicidx data and resources"
 authors = [
 "Sean Davis <seandavi@gmail.com>"
@@ -49,6 +49,7 @@ databases = "^0.2.6"
 asyncpg = "^0.20.0"
 psycopg2 = "^2.8"
 sqlalchemy = "^1.3"
+kubernetes = "^10.0.1"
 
 
 [tool.poetry.dev-dependencies]
