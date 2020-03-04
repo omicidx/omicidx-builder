@@ -39,13 +39,13 @@ def sra():
 @click.argument('mirrordir')
 def download_mirror_files(mirrordir):
     logger.info('getting xml files')
-    subprocess.run("wget -nH -np --cut-dirs=3 -r -e robots=off {}/{}/".format(
+    subprocess.run("wget -nH -nv -np --cut-dirs=3 -r -e robots=off {}/{}/".format(
         "http://ftp.ncbi.nlm.nih.gov/sra/reports/Mirroring", mirrordir),
                    shell=True)
 
     logger.info('getting SRA Accessions file')
     subprocess.run(
-        "wget ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Metadata/SRA_Accessions.tab -P {}"
+        "wget -nv ftp://ftp.ncbi.nlm.nih.gov/sra/reports/Metadata/SRA_Accessions.tab -P {}"
         .format(mirrordir),
         shell=True)
 
@@ -414,7 +414,7 @@ def biosample_to_json(biosample_file: str, output: click.File):
 
 def download_biosample():
     subprocess.run(
-        "wget ftp://ftp.ncbi.nlm.nih.gov/biosample/biosample_set.xml.gz",
+        "wget -nv ftp://ftp.ncbi.nlm.nih.gov/biosample/biosample_set.xml.gz",
         shell=True)
 
 
