@@ -128,12 +128,15 @@ def load_sra_data_to_bigquery():
                                   f'gs://temp-testing/abc/{i}.json',
                                   schema=parse_bq_json_schema(schemafile))
 
-    load_csv_to_bigquery('omicidx_etl',
-                         'sra_accessions',
-                         'gs://temp-testing/abc/SRA_Accessions.tab',
-                         field_delimiter='\t',
-                         null_marker='-',
-                         quote_character="")
+    with resources.path('omicidx_builder.data.bigquery_schemas',
+                        f"sra_accession.schema.json") as schemafile:
+        load_csv_to_bigquery('omicidx_etl',
+                             'sra_accessions',
+                             'gs://temp-testing/abc/SRA_Accessions.tab',
+                             field_delimiter='\t',
+                             null_marker='-',
+                             quote_character="",
+                             schema=parse_bq_json_schema(schemafile))
 
 
 @sra.command(help="""ETL query to public schema for all SRA entities""")

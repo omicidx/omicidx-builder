@@ -144,6 +144,7 @@ def load_csv_to_bigquery(dataset, table, uri, schema = None, drop=True, **kwargs
     else:
         job_config.autodetect = True
     job_config.source_format = bigquery.SourceFormat.CSV
+    job_config.skip_leading_rows = 1 #avoid header
 
     _load_file_to_bigquery(dataset, table, uri, job_config, schema, drop)
 
