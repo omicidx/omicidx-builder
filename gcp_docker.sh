@@ -21,7 +21,8 @@ gcloud compute instances create-with-container ob-sra \
        --container-image seandavi/omicidx-builder \
        --boot-disk-size 100G \
        --container-command '/bin/bash' \
-       --container-arg='./sra_pipeline.sh'
+       --container-arg='./sra_pipeline.sh' \
+       --scopes=cloud-platform
 gcloud compute instances create-with-container ob-biosample \
        --machine-type n1-standard-2 \
        --container-restart-policy='never' \
@@ -32,4 +33,5 @@ gcloud compute instances create-with-container ob-biosample \
        --container-image seandavi/omicidx-builder \
        --boot-disk-size 100G \
        --container-command '/bin/bash' \
-       --container-arg='./biosample_pipeline.sh'
+       --container-arg='./biosample_pipeline.sh' \
+       --scopes=cloud-platform
