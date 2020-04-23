@@ -317,7 +317,7 @@ select
   study.*,
   agg_counts.* except(accession)
 from `isb-cgc-01-0006.omicidx.sra_study` study
-join agg_counts on agg_counts.accession=study.accession
+left join agg_counts on agg_counts.accession=study.accession
 """
     query(sql)
 
@@ -361,7 +361,8 @@ def _sra_gcs_to_elasticsearch(entity):
     '--entity',
     '-e',
     multiple=True,
-    help="Entity (study, sample, experiment, run). Multiple values can be used"
+    help="Entity (study, sample, experiment, run). Multiple values can be used",
+    default = ['study','sample','experiment','run']
 )
 def sra_gcs_to_elasticsearch(entity):
     for e in entity:
