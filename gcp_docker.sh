@@ -19,7 +19,7 @@ gcloud compute instances create-with-container ob-sra \
        --container-env GCS_STAGING_URL=$GCS_STAGING_URL \
        --container-env GCS_EXPORT_URL=$GCS_EXPORT_URL \
        --container-image seandavi/omicidx-builder \
-       --boot-disk-size 100G \
+       --boot-disk-size 220G \
        --container-command '/bin/bash' \
        --container-arg='./sra_pipeline.sh' \
        --scopes=cloud-platform
@@ -31,7 +31,7 @@ gcloud compute instances create-with-container ob-biosample \
        --container-env GCS_STAGING_URL=$GCS_STAGING_URL \
        --container-env GCS_EXPORT_URL=$GCS_EXPORT_URL \
        --container-image seandavi/omicidx-builder \
-       --boot-disk-size 100G \
+       --boot-disk-size 220G \
        --container-command '/bin/bash' \
        --container-arg='./biosample_pipeline.sh' \
        --scopes=cloud-platform
