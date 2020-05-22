@@ -14,3 +14,4 @@ ATTIC
 NCBI_*
 .env
 .DS_Store
+.coverage

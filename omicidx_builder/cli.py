@@ -105,34 +105,35 @@ def process_xml_entity(entity):
 @click.argument('mirrordir')
 def upload_processed_sra_data(mirrordir):
 
+    (bucket, path) = parse_gcs_url(config.GCS_STAGING_URL)
     for entity in 'study sample experiment run'.split():
         fname = entity + '.json'
         loc_fname = os.path.join(mirrordir, fname)
-        upload_blob_to_gcs('temp-testing', loc_fname, 'abc/' + fname)
+        upload_blob_to_gcs(bucket, loc_fname, os.path.join(path, fname))
 
     fname = 'SRA_Accessions.tab'
     loc_fname = os.path.join(mirrordir, fname)
-    (bucket, path) = parse_gcs_url(config.GCS_STAGING_URL)
     upload_blob_to_gcs(bucket, loc_fname, os.path.join(path,fname))
 
 
 @sra.command(help="""Load gcs files to Bigquery""")
 def load_sra_data_to_bigquery():
     from importlib import resources
-
+    
+    (bucket, path) = parse_gcs_url(config.GCS_STAGING_URL)
     for i in 'study sample experiment run'.split():
         with resources.path('omicidx_builder.data.bigquery_schemas',
                             f"{i}.schema.json") as schemafile:
             load_json_to_bigquery('omicidx_etl',
                                   f'sra_{i}',
-                                  f'gs://temp-testing/abc/{i}.json',
+                                  os.path.join(config.GCS_STAGING_URL, f'{i}.json'),
                                   schema=parse_bq_json_schema(schemafile))
 
     with resources.path('omicidx_builder.data.bigquery_schemas',
                         f"sra_accession.schema.json") as schemafile:
         load_csv_to_bigquery('omicidx_etl',
                              'sra_accessions',
-                             'gs://temp-testing/abc/SRA_Accessions.tab',
+                             os.path.join(config.GCS_STAGING_URL, f'SRA_Accessions.tab'),
                              field_delimiter='\t',
                              null_marker='-',
                              quote_character="",
@@ -340,8 +341,9 @@ def _sra_gcs_to_elasticsearch(entity):
 
     idx_name = 'sra_' + entity + '-' + e
     logger.info(f"creating index {idx_name}")
-    bulk_index_from_gcs('omicidx-cancerdatasci-org',
-                        'exports/sra/json/{}-'.format(entity),
+    
+    bulk_index_from_gcs(bucket,
+                        os.path.join(path, '{}-'.format(entity)),
                         idx_name,
                         id_field='accession')
     old_index = index_for_alias('sra_'+entity)
@@ -431,7 +433,7 @@ def upload_biosample():
 def load_biosample_from_gcs_to_bigquery():
 
     load_json_to_bigquery('omicidx_etl', 'biosample',
-                          'gs://temp-testing/abc/biosample.json')
+                          os.path.join(config.GCS_STAGING_URL, 'biosample.json'))
 
 
 @biosample.command("""download""",
@@ -469,7 +471,7 @@ def biosample_to_public():
 def biosample_to_gcs():
     table_to_gcs(
         'omicidx', 'biosample',
-        'gs://omicidx-cancerdatasci-org/exports/biosample/json/biosample-*.json.gz'
+        os.path.join(config.GCS_EXPORT_URL,'biosample-*.json.gz')
     )
 
 
@@ -486,8 +488,9 @@ def _biosample_gcs_to_elasticsearch():
 
     idx_name = 'biosample-' + e
     logger.info(f"creating index {idx_name}")
-    bulk_index_from_gcs('omicidx-cancerdatasci-org',
-                        'exports/biosample/json/biosample-',
+    (bucket, path) = parse_gcs_url(config.GCS_STAGING_URL)
+    bulk_index_from_gcs(bucket,
+                        os.path.join(path,'biosample-'),
                         idx_name,
                         max_retries=3,
                         chunk_size=2000,
