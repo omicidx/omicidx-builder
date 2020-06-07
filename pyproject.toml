@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "omicidx_builder"
-version = "0.5.0"
+version = "0.5.1"
 description = "Tooling to build and deploy omicidx data and resources"
 authors = [
 "Sean Davis <seandavi@gmail.com>"
