@@ -6,8 +6,9 @@ from google.cloud import bigquery
 from google.cloud import storage
 from google.cloud.bigquery import SchemaField
 
-logging.basicConfig(level=logging.INFO,
-                    format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 
 def _get_field_schema(field):
@@ -15,7 +16,7 @@ def _get_field_schema(field):
 
     Works recursively if necessary to deal with 
     nested fields"""
-    
+
     name = field['name']
     field_type = field.get('type', 'STRING')
     mode = field.get('mode', 'NULLABLE')
@@ -29,11 +30,10 @@ def _get_field_schema(field):
     else:
         subschema = []
 
-    field_schema = SchemaField(name=name, 
-        field_type=field_type,
-        mode=mode,
-        fields=subschema
-    )
+    field_schema = SchemaField(name=name,
+                               field_type=field_type,
+                               mode=mode,
+                               fields=subschema)
     return field_schema
 
 
@@ -55,24 +55,25 @@ def parse_bq_json_schema(schema_filename):
     return schema
 
 
-
-def _load_file_to_bigquery(dataset, table, uri,
+def _load_file_to_bigquery(dataset,
+                           table,
+                           uri,
                            job_config: bigquery.LoadJobConfig,
-                           schema = None,
+                           schema=None,
                            drop: bool = True):
-    
+
     client = bigquery.Client()
     dataset_id = dataset
-    
+
     dataset_ref = client.dataset(dataset_id)
 
-    if(drop):
+    if (drop):
         try:
             client.delete_table(dataset_ref.table(table))
             logging.info(f'Table {table} dropped from dataset {dataset}')
         except:
             pass
-        
+
     uri = uri
 
     load_job = client.load_table_from_uri(
@@ -89,14 +90,12 @@ def _load_file_to_bigquery(dataset, table, uri,
     except google.api_core.exceptions.BadRequest:
         logging.error(f"Job loading {uri} into {dataset}.{table} failed.")
         logging.error(load_job.errors)
-    
+
     destination_table = client.get_table(dataset_ref.table(table))
     logging.info("Loaded {} rows.".format(destination_table.num_rows))
 
-    
 
-
-def load_json_to_bigquery(dataset, table, uri, schema = None, drop=True):
+def load_json_to_bigquery(dataset, table, uri, schema=None, drop=True):
     """Load a file from google cloud storage into BigQuery
 
     Parameters
@@ -113,7 +112,7 @@ def load_json_to_bigquery(dataset, table, uri, schema = None, drop=True):
         Drop the table or not.
     """
     job_config = bigquery.LoadJobConfig()
-    if(schema is not None):
+    if (schema is not None):
         job_config.schema = schema
     else:
         job_config.autodetect = True
@@ -122,7 +121,8 @@ def load_json_to_bigquery(dataset, table, uri, schema = None, drop=True):
     _load_file_to_bigquery(dataset, table, uri, job_config, schema, drop)
 
 
-def load_csv_to_bigquery(dataset, table, uri, schema = None, drop=True, **kwargs):
+def load_csv_to_bigquery(dataset, table, uri, schema=None, drop=True,
+                         **kwargs):
     """Load a file from google cloud storage into BigQuery
 
     Parameters
@@ -139,19 +139,21 @@ def load_csv_to_bigquery(dataset, table, uri, schema = None, drop=True, **kwargs
         Drop the table or not.
     """
     job_config = bigquery.LoadJobConfig(**kwargs)
-    if(schema is not None):
+    if (schema is not None):
         job_config.schema = schema
     else:
         job_config.autodetect = True
     job_config.source_format = bigquery.SourceFormat.CSV
-    job_config.skip_leading_rows = 1 #avoid header
+    job_config.skip_leading_rows = 1  #avoid header
 
     _load_file_to_bigquery(dataset, table, uri, job_config, schema, drop)
 
 
-def copy_table(src_dataset: str, dest_dataset: str,
-               src_table: str, dest_table: str,
-               drop = True):
+def copy_table(src_dataset: str,
+               dest_dataset: str,
+               src_table: str,
+               dest_table: str,
+               drop=True):
     client = bigquery.Client()
     source_dataset = client.dataset(src_dataset)
     source_table_ref = source_dataset.table(src_table)
@@ -159,10 +161,11 @@ def copy_table(src_dataset: str, dest_dataset: str,
     dest_dataset = client.dataset(dest_dataset)
     dest_table_ref = dest_dataset.table(dest_table)
 
-    if(drop):
+    if (drop):
         try:
             client.delete_table(dest_table_ref)
-            logging.info(f'Table {dest_table} dropped from dataset {dest_dataset}')
+            logging.info(
+                f'Table {dest_table} dropped from dataset {dest_dataset}')
         except:
             pass
     job = client.copy_table(
@@ -171,31 +174,34 @@ def copy_table(src_dataset: str, dest_dataset: str,
         # Location must match that of the source and destination tables.
         location="US",
     )  # API request
-    
+
     logging.info("Starting job {}".format(job.job_id))
-    logging.info(f"copying {src_dataset}.{src_table} to {dest_dataset}.{dest_table}")
+    logging.info(
+        f"copying {src_dataset}.{src_table} to {dest_dataset}.{dest_table}")
 
     try:
         job.result()  # Waits for table load to complete.
         logging.info("Job finished.")
     except google.api_core.exceptions.BadRequest:
-        logging.error(f"Job copying {src_dataset}.{src_table} to {dest_dataset}.{dest_table} failed")
+        logging.error(
+            f"Job copying {src_dataset}.{src_table} to {dest_dataset}.{dest_table} failed"
+        )
         logging.error(load_job.errors)
-    
 
 
-
-def query_to_destination(dest_dataset: str, dest_table: str,
+def query_to_destination(dest_dataset: str,
+                         dest_table: str,
                          sql: str,
-                         drop = True):
+                         drop=True):
     client = bigquery.Client()
     dest_dataset = client.dataset(dest_dataset)
     dest_table_ref = dest_dataset.table(dest_table)
 
-    if(drop):
+    if (drop):
         try:
             client.delete_table(dest_table_ref)
-            logging.info(f'Table {dest_table} dropped from dataset {dest_dataset}')
+            logging.info(
+                f'Table {dest_table} dropped from dataset {dest_dataset}')
         except:
             pass
 
@@ -210,18 +216,19 @@ def query_to_destination(dest_dataset: str, dest_table: str,
         location="US",
         job_config=job_config,
     )
-    
+
     logging.info("Starting job {}".format(query_job.job_id))
     logging.info(f"----------------------{sql}---------------------")
     logging.info(f"querying to {dest_dataset}.{dest_table}")
-    
+
     try:
         query_job.result()  # Waits for table load to complete.
-        logging.info("Query results loaded to table {}".format(dest_table_ref.path))
+        logging.info("Query results loaded to table {}".format(
+            dest_table_ref.path))
     except google.api_core.exceptions.BadRequest:
         logging.error(f"querying to {dest_dataset}.{dest_table} failed")
         logging.error(query_job.errors)
-    
+
 
 def query(sql: str):
     client = bigquery.Client()
@@ -236,19 +243,23 @@ def query(sql: str):
         location="US",
         job_config=job_config,
     )
-    
+
     logging.info("Starting job {}".format(query_job.job_id))
     logging.info(f"----------------------{sql}---------------------\n")
-    
+
     try:
         query_job.result()  # Waits for table load to complete.
         logging.info("Query completed")
     except google.api_core.exceptions.BadRequest:
         logging.error(f"query failed")
         logging.error(query_job.errors)
-    
 
-def table_to_gcs(dataset: str, table: str, uri: str, gzip: bool=True, delete_first: bool=True):
+
+def table_to_gcs(dataset: str,
+                 table: str,
+                 uri: str,
+                 gzip: bool = True,
+                 delete_first: bool = True):
     """Load a file from google cloud storage into BigQuery
 
     Parameters
@@ -267,22 +278,22 @@ def table_to_gcs(dataset: str, table: str, uri: str, gzip: bool=True, delete_fir
     destination_uri = uri
     dataset_ref = client.dataset(dataset)
     table_ref = dataset_ref.table(table)
-    
-    logging.info("Exporting {}.{} to {}".format(dataset, table, destination_uri))
+
+    logging.info("Exporting {}.{} to {}".format(dataset, table,
+                                                destination_uri))
 
     job_config = bigquery.ExtractJobConfig()
 
-    if(gzip):
+    if (gzip):
         job_config.compression = bigquery.Compression.GZIP
         job_config.destination_format = bigquery.DestinationFormat.NEWLINE_DELIMITED_JSON
-    
+
     extract_job = client.extract_table(
         table_ref,
         destination_uri,
         # Location must match that of the source table.
         location="US",
-        job_config = job_config
-    )  # API request
+        job_config=job_config)  # API request
     try:
         extract_job.result()  # Waits for table load to complete.
         logging.info("Extract completed")
@@ -290,4 +301,5 @@ def table_to_gcs(dataset: str, table: str, uri: str, gzip: bool=True, delete_fir
         logging.error(f"extract failed")
         logging.error(extract_job.errors)
 
-    logging.info("Exported {}.{} to {}".format(dataset, table, destination_uri))
+    logging.info("Exported {}.{} to {}".format(dataset, table,
+                                               destination_uri))

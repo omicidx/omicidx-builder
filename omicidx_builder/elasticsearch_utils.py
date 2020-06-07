@@ -5,45 +5,48 @@ from omicidx_builder.config import config
 import json
 import logging
 import gzip
-logging.basicConfig(level = logging.INFO, format = logging.BASIC_FORMAT)
+logging.basicConfig(level=logging.INFO, format=logging.BASIC_FORMAT)
 import os
 
 
 def init_connection_object():
-    connections.create_connection(
-        alias='default',
-        hosts=config.ES_HOST,
-        retry_on_timeout = True,
-        max_retries = 3,
-        timeout = 30
-    )
+    connections.create_connection(alias='default',
+                                  hosts=config.ES_HOST,
+                                  retry_on_timeout=True,
+                                  max_retries=3,
+                                  timeout=30)
+
 
 init_connection_object()
 
+
 def get_client() -> elasticsearch.client:
     return connections.get_connection()
-    
+
 
 client = get_client()
+
 
 def prep_data(fname, index, id_field):
     with gzip.open(fname) as f:
         for line in f:
             d = json.loads(line)
             d['_index'] = index
-            if(id_field is not None):
-                if(id_field in d):
+            if (id_field is not None):
+                if (id_field in d):
                     d['_id'] = d[id_field]
                 else:
                     continue
-            yield(d)
+            yield (d)
 
-def bulk_index(fname, index, id_field = None, **kwargs):
+
+def bulk_index(fname, index, id_field=None, **kwargs):
     bulk(get_client(), prep_data(fname, index, id_field), **kwargs)
 
 
 def put_template(template_name: str, template_body: dict):
     client.indices.put_template(template_name, template_body)
+
 
 def bulk_index_from_gcs(bucket, prefix, index, id_field=None, **kwargs):
     """Perform bulk indexing from a set of gcs blobs
@@ -67,23 +70,24 @@ def bulk_index_from_gcs(bucket, prefix, index, id_field=None, **kwargs):
     logging.info(f'Found {len(flist)} files for indexing')
     for i in flist:
         tmpfile = NamedTemporaryFile()
-        if(i.name.endswith('.gz')):
+        if (i.name.endswith('.gz')):
             tmpfile = NamedTemporaryFile(suffix='.gz')
         logging.info('Downloading ' + i.name)
         i.download_to_filename(tmpfile.name)
         logging.info('Indexing ' + i.name)
         bulk_index(tmpfile.name, index, id_field=id_field, **kwargs)
         tmpfile.close()
-        
+
+
 def delete_index(index):
     """Delete the named index"""
     if client.indices.exists(index):
         client.indices.delete(index)
     else:
         logging.warn(f"index {index} does not exist, so not deleted!")
-        
 
-def create_alias(alias: str, index:str):
+
+def create_alias(alias: str, index: str):
     """Create an alias for an index
 
     Parameters
@@ -97,9 +101,11 @@ def create_alias(alias: str, index:str):
         client.indices.put_alias(index, alias)
         logging.info(f"alias {alias} for index {index} created")
     else:
-        logging.warn(f"index {index} does not exist, so alias {alias} not created")
+        logging.warn(
+            f"index {index} does not exist, so alias {alias} not created")
 
-def delete_alias(alias: str, index:str = None):
+
+def delete_alias(alias: str, index: str = None):
     """Create an alias for an index
 
     Parameters
@@ -140,7 +146,9 @@ def swap_indices_behind_alias(alias: str, old_index: str, new_index: str):
         client.indices.put_alias(index=new_index, name=alias)
         logging.info(f"alias {alias} for index {new_index} created")
     else:
-        logging.warn(f"new index {new_index} does not exist, so alias {alias} remains unchanged")
+        logging.warn(
+            f"new index {new_index} does not exist, so alias {alias} remains unchanged"
+        )
 
 
 def index_for_alias(alias: str):

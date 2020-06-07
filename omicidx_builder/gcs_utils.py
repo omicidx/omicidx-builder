@@ -19,12 +19,16 @@ def upload_blob_to_gcs(bucket_name, source_file_name, destination_blob_name):
     bucket = storage_client.get_bucket(bucket_name)
     blob = bucket.blob(destination_blob_name)
 
-    logging.info(f'Uploading file {source_file_name} to gs://{bucket_name}/{destination_blob_name}.')
+    logging.info(
+        f'Uploading file {source_file_name} to gs://{bucket_name}/{destination_blob_name}.'
+    )
 
-    
     blob.upload_from_filename(source_file_name)
 
-    logging.info(f'File {source_file_name} uploaded to gs://{bucket_name}/{destination_blob_name}.')
+    logging.info(
+        f'File {source_file_name} uploaded to gs://{bucket_name}/{destination_blob_name}.'
+    )
+
 
 def list_blobs(bucket_name, prefix):
     """list blobs in a bucket given a prefix
@@ -37,11 +41,12 @@ def list_blobs(bucket_name, prefix):
     """
     storage_client = storage.Client()
     return storage_client.list_blobs(bucket_name, prefix=prefix)
-    
+
+
 def parse_gcs_url(url: str) -> tuple():
     import re
     splitter = re.compile('gs://([^/.]+)/(.*)')
     m = splitter.match(url)
     if m is None:
         logging.error(f'{url} does not look like a gs url')
-    return((m[1],m[2]))
+    return ((m[1], m[2]))
