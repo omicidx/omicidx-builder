@@ -8,11 +8,8 @@ from .config import config
 from .bigquery_utils import *
 import omicidx.sra.parser
 from .click_root import cli
-from .geo_cli import geo
-import argparse
+# from .geo_cli import geo
 import json
-import logging
-import collections
 from xml.etree import ElementTree as et
 from .utils import dateconverter
 from .gcs_utils import upload_blob_to_gcs, parse_gcs_url
@@ -331,30 +328,32 @@ def sra_bigquery_for_elasticsearch():
 def _sra_gcs_to_elasticsearch(entity):
     from omicidx_builder.elasticsearch_utils import (
         bulk_index_from_gcs,
-        swap_indices_behind_alias,
         index_for_alias,
         create_alias,
         delete_index
-    )                                                
+    )
     import uuid
     e = str(uuid.uuid4())
 
+    (bucket, path) = parse_gcs_url(config.GCS_EXPORT_URL)
+    path = path.strip('/')
+
     idx_name = 'sra_' + entity + '-' + e
     logger.info(f"creating index {idx_name}")
-    
+
     bulk_index_from_gcs(bucket,
-                        os.path.join(path, '{}-'.format(entity)),
+                        os.path.join(path, 'sra/{}-'.format(entity)),
                         idx_name,
                         id_field='accession')
     old_index = index_for_alias('sra_'+entity)
     if old_index is None:
         create_alias('sra_'+entity, idx_name)
-        logger.info(f'alias sra_{entity} now points to {idx_name}')
     else:
-        swap_indices_behind_alias('sra_'+entity, old_index, idx_name)
-        logger.info(f'alias sra_{entity} now points to {idx_name}')
-        delete_index(old_index)
-        logger.info(f'deleted old index {old_index}')
+        for index in old_index.keys():
+            delete_index(index)
+            logger.info(f'deleted old index {index}')
+        create_alias('sra_'+entity, idx_name)
+    logger.info(f'alias sra_{entity} now points to {idx_name}')
 
 
 @sra.command('gcs-to-elasticsearch',
@@ -371,18 +370,19 @@ def sra_gcs_to_elasticsearch(entity):
         _sra_gcs_to_elasticsearch(e)
 
 
-def _sra_to_gcs_for_elasticsearch(bucket: str="omicidx-cancerdatasci-org",
-                                  path: str="exports/sra/json"):
+def _sra_to_gcs_for_elasticsearch():
     from google.cloud import storage
+    (bucket, path) = parse_gcs_url(config.GCS_EXPORT_URL)
+    path = path.strip('/')
     client = storage.Client()
-    blobs = client.list_blobs(bucket, prefix=path+'/')
+    blobs = client.list_blobs(bucket, prefix=os.path.join(path,'sra'))
     for blob in blobs:
-        logging.info(f"deleting {blob.name}")
+        logger.info(f"deleting {blob.name}")
         blob.delete()
     for entity in 'experiment study sample run'.split():
         table_to_gcs(
             'omicidx_etl', f'sra_{entity}_for_es',
-            f'gs://{bucket}/{path}/{entity}-*.json.gz'
+            f'gs://{bucket}/{path}/sra/{entity}-*.json.gz'
         )
 
 
@@ -407,15 +407,15 @@ from omicidx.biosample import BioSampleParser
 
 def biosample_to_json(biosample_file: str, output: click.File):
     n = 0
-    logging.info(f'starting biosample record parsing')
+    logger.info(f'starting biosample record parsing')
     for i in BioSampleParser(biosample_file):
         n+=1
         if (i is None):
             break
         if (n % 100000 == 0):
-            logging.info(f'{n} biosample records parsed')
+            logger.info(f'{n} biosample records parsed')
         output.write(i.as_json() + "\n")
-    logging.info(f'completing biosample record parsing')
+    logger.info(f'completing biosample record parsing')
 
 
 def download_biosample():

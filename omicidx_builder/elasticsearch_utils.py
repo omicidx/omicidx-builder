@@ -57,11 +57,12 @@ def bulk_index_from_gcs(bucket, prefix, index, id_field=None, **kwargs):
     index: str
         The elasticsearch index name
     id_field: str
-        The id field name (default None) that will be used as the 
+        The id field name (default None) that will be used as the
         `_id` field in elasticsearch
     """
     from tempfile import NamedTemporaryFile
     from .gcs_utils import list_blobs
+    logging.info(f'{bucket}/{prefix}')
     flist = list(list_blobs(bucket, prefix))
     logging.info(f'Found {len(flist)} files for indexing')
     for i in flist:
@@ -134,6 +135,8 @@ def swap_indices_behind_alias(alias: str, old_index: str, new_index: str):
         The name of the new index to which to assign the alias.
     """
     if client.indices.exists(index=new_index):
+        for index in index_for_alias(alias).keys():
+            delete_index(index)
         client.indices.put_alias(index=new_index, name=alias)
         logging.info(f"alias {alias} for index {new_index} created")
     else:
@@ -152,8 +155,9 @@ def index_for_alias(alias: str):
     -------
     str: the name of the matching index (or None)
     """
-    res = client.indices.get_alias(name=alias)
+    res = None
     try:
-        return list(res.keys())
+        res = client.indices.get_alias(name=alias)
     except:
         return None
+    return res
