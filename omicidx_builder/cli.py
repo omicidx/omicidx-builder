@@ -105,11 +105,11 @@ def upload_processed_sra_data(mirrordir):
     for entity in 'study sample experiment run'.split():
         fname = entity + '.json'
         loc_fname = os.path.join(mirrordir, fname)
-        upload_blob_to_gcs(bucket, loc_fname, os.path.join(path, fname))
+        upload_blob_to_gcs(bucket, loc_fname, os.path.join(path,fname))
 
     fname = 'SRA_Accessions.tab'
     loc_fname = os.path.join(mirrordir, fname)
-    upload_blob_to_gcs(bucket, loc_fname, os.path.join(path, fname))
+    upload_blob_to_gcs(bucket, loc_fname, os.path.join(path,fname))
 
 
 @sra.command(help="""Load gcs files to Bigquery""")
@@ -122,16 +122,14 @@ def load_sra_data_to_bigquery():
                             f"{i}.schema.json") as schemafile:
             load_json_to_bigquery('omicidx_etl',
                                   f'sra_{i}',
-                                  os.path.join(config.GCS_STAGING_URL,
-                                               f'{i}.json'),
+                                  os.path.join(config.GCS_STAGING_URL,f'{i}.json',
                                   schema=parse_bq_json_schema(schemafile))
 
     with resources.path('omicidx_builder.data.bigquery_schemas',
                         f"sra_accession.schema.json") as schemafile:
         load_csv_to_bigquery('omicidx_etl',
                              'sra_accessions',
-                             os.path.join(config.GCS_STAGING_URL,
-                                          f'SRA_Accessions.tab'),
+                             os.path.join(config.GCS_STAGING_URL,'SRA_Accessions.tab',
                              field_delimiter='\t',
                              null_marker='-',
                              quote_character="",
