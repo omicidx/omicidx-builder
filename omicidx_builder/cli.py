@@ -13,6 +13,7 @@ import json
 from xml.etree import ElementTree as et
 from .utils import dateconverter
 from .gcs_utils import upload_blob_to_gcs, parse_gcs_url
+from . import pubmed_cli
 
 logging.basicConfig(
     level=logging.INFO,
@@ -122,14 +123,14 @@ def load_sra_data_to_bigquery():
                             f"{i}.schema.json") as schemafile:
             load_json_to_bigquery('omicidx_etl',
                                   f'sra_{i}',
-                                  os.path.join(config.GCS_STAGING_URL,f'{i}.json',
+                                  os.path.join(config.GCS_STAGING_URL,f'{i}.json'),
                                   schema=parse_bq_json_schema(schemafile))
 
     with resources.path('omicidx_builder.data.bigquery_schemas',
                         f"sra_accession.schema.json") as schemafile:
         load_csv_to_bigquery('omicidx_etl',
                              'sra_accessions',
-                             os.path.join(config.GCS_STAGING_URL,'SRA_Accessions.tab',
+                             os.path.join(config.GCS_STAGING_URL,'SRA_Accessions.tab'),
                              field_delimiter='\t',
                              null_marker='-',
                              quote_character="",
